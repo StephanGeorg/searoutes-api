@@ -1,5 +1,5 @@
 import log from '../../utils/logs/logs';
-import preprocess from './preprocess';
+import SeaRoutesService from '../../services/searoutes';
 
 // import { readKeys } from '../middleware/auth/auth';
 
@@ -9,10 +9,11 @@ const { name } = pjson;
 const env = `${process.env.NODE_ENV || 'development'}`;
 
 export default (server, startTime) => {
-  // Start listining for new keys
+  // Start listening for new keys
   // readKeys();
 
-  preprocess.init();
+  // Initialize searoute data
+  SeaRoutesService.init();
 
   // Event listener for kill signals
   process.on('SIGINT', () => {

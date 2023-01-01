@@ -23,10 +23,10 @@ app.use(morgan('combined', { stream: logger.stream }));
 app.use(authenticate); // Authenticate request
 app.use(cors()); // Enable CORS headers
 app.use(bodyParser.json());
-// app.use(boolParser);
 
 // Routes
-app.use(`${config.get('api.prefix')}/users`, routes.users);
+app.use(`${config.get('api.prefix')}/searoutes`, routes.seaRoutes);
+// app.use(`${config.get('api.prefix')}/users`, routes.users);
 
 // Error handler
 app.use(error);
