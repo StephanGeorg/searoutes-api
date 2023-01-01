@@ -1,0 +1,34 @@
+{
+  "db": {
+    "mongo": {
+      "url": "mongodb://user:pwd@host1:27017,host2:27017",
+      "database": "nearest-importer",
+      "replicaSet": "reps0",
+      "collections": {
+        "users": "users",
+        "animals": "animals"
+      },
+      "connectOptions": {
+        "useNewUrlParser": true
+      }
+    },
+    "postgres": {
+      "database": "dataimport",
+      "user": "postgres",
+      "host": "localhost",
+      "port": 5432,
+      "max": 20,
+      "min": 4,
+      "idleTimeoutMillis": 1000,
+      "connectionTimeoutMillis": 1000
+    }
+  },
+  "api": {
+    "prefix": "/api"
+  },
+  "logs": {
+    "dogstatsd": {
+      "port": ""
+    }
+  }
+}
