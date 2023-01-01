@@ -1,5 +1,7 @@
 import log from '../../utils/logs/logs';
-import { readKeys } from '../middleware/auth/auth';
+import preprocess from './preprocess';
+
+// import { readKeys } from '../middleware/auth/auth';
 
 const pjson = require('../../../package.json');
 
@@ -8,7 +10,9 @@ const env = `${process.env.NODE_ENV || 'development'}`;
 
 export default (server, startTime) => {
   // Start listining for new keys
-  readKeys();
+  // readKeys();
+
+  preprocess.init();
 
   // Event listener for kill signals
   process.on('SIGINT', () => {

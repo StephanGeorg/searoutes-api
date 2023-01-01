@@ -31,6 +31,7 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.12.13",
+    "@turf/turf": "^6.5.0",
     "body-parser": "^1.19.0",
     "celebrate": "^12.2.0",
     "config": "^3.3.2",
@@ -39,6 +40,7 @@
     "express": "^4.18.2",
     "express-query-boolean": "^2.0.0",
     "fast-safe-stringify": "^2.0.7",
+    "geojson-path-finder": "^2.0.0",
     "hot-shots": "^8.3.0",
     "http-status": "^1.4.2",
     "lodash.find": "^4.6.0",
