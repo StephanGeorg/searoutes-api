@@ -24,20 +24,20 @@ export default {
   },
 
   /**
-   *  Get a particular user
+   *  Get shortest sea route between two points
    */
   async getShortestRoute(req, res, next) {
     const { startPoint, endPoint } = req.params;
     const startCoord = startPoint.split(',');
     const endCoord = endPoint.split(',');
     try {
-      const seaRoute = await SeaRoutesService.getRoute(startCoord, endCoord);
+      const seaRoute = await SeaRoutesService.getShortestRoute(startCoord, endCoord);
       if (!seaRoute) throw errors.default;
       res.json(seaRoute);
     } catch (error) {
       next(extendError(
         error,
-        { task: 'SeaRoutes/getRoute', context: { startPoint, endPoint } },
+        { task: 'SeaRoutes/getShortestRoute', context: { startPoint, endPoint } },
       ));
     }
   },

@@ -35,7 +35,7 @@ export default {
 
   snapPointToVertex(point = {}) {
     // if (!turf.booleanValid(point)) return null;
-    return turf.nearestPoint(point, verticesFeatureCollection);
+    return turf.nearestPoint(point, this.getVerticesFeatureCollection());
   },
 
   /**
@@ -45,7 +45,7 @@ export default {
    * @returns
    */
   getShortestPath(startPoint = {}, endPoint = {}) {
-    const path = pathFinder.findPath(startPoint, endPoint);
+    const path = this.getPathFinder().findPath(startPoint, endPoint);
     return path
       ? {
         path: turf.lineString(path.path),
@@ -55,12 +55,12 @@ export default {
   },
 
   /**
-   *
+   * Get shortest route between two points snapped to network
    * @param {*} startPoint
    * @param {*} endPoint
    * @returns
    */
-  getRoute(startPoint = '', endPoint = '') {
+  getShortestRoute(startPoint = '', endPoint = '') {
     const start = turf.point(startPoint);
     const end = turf.point(endPoint);
 
