@@ -1,7 +1,7 @@
 {
   "name": "searoutes-api",
   "version": "0.0.1",
-  "description": "SeaRoute computes shortest maritime routes between two locations.",
+  "description": "Computes shortest maritime routes between two locations.",
   "main": "./dist/server.js",
   "scripts": {
     "build": "babel src --presets @babel/preset-env --plugins @babel/plugin-transform-runtime --out-dir dist",

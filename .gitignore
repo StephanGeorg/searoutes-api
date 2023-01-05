@@ -3,3 +3,5 @@
 /logs/
 .DS_Store
 /.nyc_output
+*.ecosystem.config.js
+ecosystem.config.js
