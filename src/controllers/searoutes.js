@@ -20,6 +20,9 @@ export default {
         startPoint: Joi.string().required(),
         endPoint: Joi.string().required(),
       },
+      [Segments.QUERY]: {
+        path: Joi.bool(),
+      },
     },
   },
 
@@ -28,10 +31,12 @@ export default {
    */
   async getShortestRoute(req, res, next) {
     const { startPoint, endPoint } = req.params;
+    const { path } = req.query;
+    console.log({ path });
     const startCoord = startPoint.split(',');
     const endCoord = endPoint.split(',');
     try {
-      const seaRoute = await SeaRoutesService.getShortestRoute(startCoord, endCoord);
+      const seaRoute = await SeaRoutesService.getShortestRoute(startCoord, endCoord, path);
       if (!seaRoute) throw errors.default;
       res.json(seaRoute);
     } catch (error) {

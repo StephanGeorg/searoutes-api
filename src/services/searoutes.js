@@ -44,11 +44,11 @@ export default {
    * @param {object} endPoint
    * @returns
    */
-  getShortestPath(startPoint = {}, endPoint = {}) {
+  getShortestPath(startPoint = {}, endPoint = {}, returnPath = true) {
     const path = this.getPathFinder().findPath(startPoint, endPoint);
     return path
       ? {
-        path: turf.lineString(path.path),
+        path: returnPath === true ? turf.lineString(path.path) : undefined,
         distance: path.weight,
         distanceNM: path.weight * 0.539957,
       } : null;
@@ -60,14 +60,17 @@ export default {
    * @param {*} endPoint
    * @returns
    */
-  getShortestRoute(startPoint = '', endPoint = '') {
+  getShortestRoute(startPoint = '', endPoint = '', returnPath) {
     const start = turf.point(startPoint);
     const end = turf.point(endPoint);
 
+    // Snap coords to network
     const startPointSnapped = this.snapPointToVertex(start);
     const endPointSnapped = this.snapPointToVertex(end);
 
-    return this.getShortestPath(startPointSnapped, endPointSnapped);
+    const shortestPath = this.getShortestPath(startPointSnapped, endPointSnapped, returnPath);
+
+    return shortestPath;
   },
 
 };
