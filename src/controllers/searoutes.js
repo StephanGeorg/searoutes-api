@@ -32,7 +32,6 @@ export default {
   async getShortestRoute(req, res, next) {
     const { startPoint, endPoint } = req.params;
     const { path } = req.query;
-    console.log({ path });
     const startCoord = startPoint.split(',');
     const endCoord = endPoint.split(',');
     try {
