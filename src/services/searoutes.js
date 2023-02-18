@@ -44,7 +44,13 @@ export default {
     return this.getVertices()[id];
   },
 
+  /**
+   * Snap a point to nearest vertex of the network
+   * @param {object} point
+   * @returns {object}
+   */
   snapPointToVertex(point = {}) {
+    if (!point) return null;
     const neighborId = index.neighbors(
       point.geometry.coordinates[0],
       point.geometry.coordinates[1],
@@ -83,7 +89,14 @@ export default {
     const startPointSnapped = this.snapPointToVertex(start);
     const endPointSnapped = this.snapPointToVertex(end);
 
-    const shortestPath = this.getShortestPath(startPointSnapped, endPointSnapped, returnPath);
+    if (!startPointSnapped || !endPointSnapped) throw new Error('Point missing');
+
+    // Get shortest path from network
+    const shortestPath = this.getShortestPath(
+      startPointSnapped,
+      endPointSnapped,
+      returnPath,
+    );
 
     return shortestPath;
   },
