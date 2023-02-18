@@ -40,6 +40,7 @@
     "express": "^4.18.2",
     "express-query-boolean": "^2.0.0",
     "fast-safe-stringify": "^2.0.7",
+    "flatbush": "^3.3.1",
     "geojson-path-finder": "^2.0.0",
     "hot-shots": "^8.3.0",
     "http-status": "^1.4.2",

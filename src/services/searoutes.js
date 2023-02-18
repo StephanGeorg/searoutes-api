@@ -1,10 +1,12 @@
 import PathFinder from 'geojson-path-finder';
+import Flatbush from 'flatbush';
 import * as turf from '@turf/turf';
 
 const geojson = require('../../data/eurostat.json');
 
 let pathFinder;
-let verticesFeatureCollection;
+let vertices;
+let index;
 
 export default {
   /**
@@ -13,8 +15,12 @@ export default {
   init() {
     // Load vertices from routes
     console.time('Preparing data ...');
-    const vertices = turf.coordAll(geojson).map((coords) => turf.point(coords));
-    verticesFeatureCollection = turf.featureCollection(vertices);
+    vertices = turf.coordAll(geojson).map((coords) => coords);
+    index = new Flatbush(vertices.length);
+    vertices.forEach((vertex) => {
+      index.add(vertex[0], vertex[1], vertex[0], vertex[1]);
+    });
+    index.finish();
     console.timeEnd('Preparing data ...');
     // Generate path
     console.time('Generate path ...');
@@ -29,13 +35,22 @@ export default {
     return pathFinder;
   },
 
-  getVerticesFeatureCollection() {
-    return verticesFeatureCollection;
+  getVertices() {
+    return vertices;
+  },
+
+  getVertex(id) {
+    if (!id) return null;
+    return this.getVertices()[id];
   },
 
   snapPointToVertex(point = {}) {
-    // if (!turf.booleanValid(point)) return null;
-    return turf.nearestPoint(point, this.getVerticesFeatureCollection());
+    const neighborId = index.neighbors(
+      point.geometry.coordinates[0],
+      point.geometry.coordinates[1],
+      1,
+    );
+    return turf.point(this.getVertex(neighborId[0]));
   },
 
   /**
