@@ -17,8 +17,13 @@ export default {
   validate: {
     getRoute: {
       [Segments.PARAMS]: {
-        startPoint: Joi.string().required(),
-        endPoint: Joi.string().required(),
+        startPoint: Joi
+          .string()
+          .required(),
+        endPoint: Joi
+          .string()
+          .invalid(Joi.ref('startPoint')) // End point must be different from start point
+          .required(),
       },
       [Segments.QUERY]: {
         path: Joi.bool(),

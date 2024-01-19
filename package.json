@@ -1,6 +1,6 @@
 {
   "name": "searoutes-api",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Computes shortest maritime routes between two locations.",
   "main": "./dist/server.js",
   "scripts": {
