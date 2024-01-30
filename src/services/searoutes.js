@@ -81,7 +81,7 @@ export default {
    * @param {*} endPoint
    * @returns
    */
-  getShortestRoute(startPoint = '', endPoint = '', returnPath) {
+  getShortestRoute(startPoint = [], endPoint = [], returnPath) {
     const start = turf.point(startPoint);
     const end = turf.point(endPoint);
 
