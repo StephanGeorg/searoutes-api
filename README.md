@@ -1,6 +1,6 @@
 # Searoutes 
 
-Heavily inspired by [Eurostat SeaRoute](https://github.com/eurostat/searoute. 
+Heavily inspired by [Eurostat SeaRoute](https://github.com/eurostat/searoute). 
 
 ## Data
   
