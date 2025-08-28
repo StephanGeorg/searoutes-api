@@ -2,11 +2,74 @@ import PathFinder from 'geojson-path-finder';
 import Flatbush from 'flatbush';
 import * as turf from '@turf/turf';
 
+const splitGeoJSON = require('geojson-antimeridian-cut');
+
 const geojson = require('../../data/eurostat.json');
 
 let pathFinder;
 let vertices;
 let index;
+
+
+const R_EARTH = 6371000;
+const toRad = d => d * Math.PI/180;
+const haversineMeters = (a,b) => {
+  const [lon1,lat1]=a,[lon2,lat2]=b;
+  const dφ=toRad(lat2-lat1), dλ=toRad(lon2-lon1);
+  const φ1=toRad(lat1), φ2=toRad(lat2);
+  const s=Math.sin(dφ/2)**2 + Math.cos(φ1)*Math.cos(φ2)*Math.sin(dλ/2)**2;
+  return 2*R_EARTH*Math.asin(Math.sqrt(s));
+};
+
+function shiftLon(coord, dx) {
+  let [lon, lat] = coord;
+  return [lon + dx, lat];
+}
+
+function shiftGeometry(geom, dx) {
+  const mapCoords = (coords) => coords.map(c =>
+    Array.isArray(c[0]) ? mapCoords(c) : shiftLon(c, dx)
+  );
+  return { type: geom.type, coordinates: mapCoords(geom.coordinates) };
+}
+
+function triplicateGeoJSON(fc) {
+  const shifts = [-360, 0, 360];
+  const features = [];
+  for (const f of fc.features) {
+    for (const dx of shifts) {
+      features.push({
+        type: 'Feature',
+        properties: { ...f.properties, __wrapShift: dx },
+        geometry: shiftGeometry(f.geometry, dx),
+      });
+    }
+  }
+  return { type: 'FeatureCollection', features };
+}
+
+function unwrapPath(path) {
+  // Bring longitudes back to [-180, 180] for rendering
+  return path.map(([lon, lat]) => {
+    let x = lon;
+    while (x > 180) x -= 360;
+    while (x < -180) x += 360;
+    return [x, lat];
+  });
+}
+
+function normalizePair(a, b) {
+  // a, b are [lon, lat]
+  let [lonA, latA] = a;
+  let [lonB, latB] = b;
+
+  if (Math.abs(lonA - lonB) > 180) {
+    // Move the smaller one east or the larger one west—either is fine:
+    if (lonA < lonB) lonA += 360;
+    else lonB += 360;
+  }
+  return [[lonA, latA], [lonB, latB]];
+}
 
 export default {
   /**
@@ -24,7 +87,12 @@ export default {
     console.timeEnd('Preparing data ...');
     // Generate path
     console.time('Generate path ...');
-    pathFinder = new PathFinder(geojson, {
+
+    const tripled = triplicateGeoJSON(geojson);
+
+    pathFinder = new PathFinder(tripled, {
+      // tolerance: 1e-7,
+      weight: (a, b) => haversineMeters(a, b),
       // edgeDataReducer: (a, p) => ( p.id),
       // edgeDataSeed: (properties) => (properties.id),
     });
@@ -66,6 +134,26 @@ export default {
    * @returns
    */
   getShortestPath(startPoint = {}, endPoint = {}, returnPath = true) {
+    const start = startPoint.geometry.coordinates;
+    const end = endPoint.geometry.coordinates;
+
+
+    const [A, B] = normalizePair(start, end);
+
+  // Turn A and B into geojson with turf.point
+    const AasGeoJSON = turf.point(A);
+    const BasGeoJSON = turf.point(B);
+
+    const res = this.getPathFinder().findPath(AasGeoJSON, BasGeoJSON);
+    return {
+      ...res,
+      path: splitGeoJSON(turf.lineString(unwrapPath(res.path))),
+      distance: res.weight / 1000,
+      distanceNM: (res.weight / 1000) * 0.539957,
+    };
+
+
+
     const path = this.getPathFinder().findPath(startPoint, endPoint);
     return path
       ? {
