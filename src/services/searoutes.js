@@ -1,6 +1,14 @@
 import PathFinder from 'geojson-path-finder';
 import Flatbush from 'flatbush';
 import * as turf from '@turf/turf';
+import splitGeoJSON from 'geojson-antimeridian-cut';
+
+import {
+  triplicateGeoJSON,
+  haversineMeters,
+  normalizePair,
+  unwrapPath,
+} from '../utils/helper/geo';
 
 const geojson = require('../../data/eurostat.json');
 
@@ -14,21 +22,27 @@ export default {
    */
   init() {
     // Load vertices from routes
-    console.time('Preparing data ...');
+    console.time('Indexing vertices data');
     vertices = turf.coordAll(geojson).map((coords) => coords);
     index = new Flatbush(vertices.length);
     vertices.forEach((vertex) => {
       index.add(vertex[0], vertex[1], vertex[0], vertex[1]);
     });
     index.finish();
-    console.timeEnd('Preparing data ...');
-    // Generate path
-    console.time('Generate path ...');
-    pathFinder = new PathFinder(geojson, {
-      // edgeDataReducer: (a, p) => ( p.id),
-      // edgeDataSeed: (properties) => (properties.id),
+    console.timeEnd('Indexing vertices data');
+
+    console.time('Triplicating GeoJSON');
+    const tripled = triplicateGeoJSON(geojson);
+    console.timeEnd('Triplicating GeoJSON');
+
+    console.time('Generating path');
+    pathFinder = new PathFinder(tripled, {
+      // tolerance: 1e-7, // Custom tolerance
+      weight: (a, b) => haversineMeters(a, b), // Custom weight function
+      // edgeDataReducer: (a, p) => ( p.id), // Custom edge data reducer
+      // edgeDataSeed: (properties) => (properties.id), // Custom edge data seed
     });
-    console.timeEnd('Generate path ...');
+    console.timeEnd('Generating path');
   },
 
   getPathFinder() {
@@ -66,12 +80,21 @@ export default {
    * @returns
    */
   getShortestPath(startPoint = {}, endPoint = {}, returnPath = true) {
-    const path = this.getPathFinder().findPath(startPoint, endPoint);
-    return path
+    const start = startPoint.geometry.coordinates;
+    const end = endPoint.geometry.coordinates;
+    const [A, B] = normalizePair(start, end);
+
+    // Turn A and B into geojson with turf.point
+    const AasGeoJSON = turf.point(A);
+    const BasGeoJSON = turf.point(B);
+
+    const res = this.getPathFinder().findPath(AasGeoJSON, BasGeoJSON);
+    return res
       ? {
-        path: returnPath === true ? turf.lineString(path.path) : undefined,
-        distance: path.weight,
-        distanceNM: path.weight * 0.539957,
+        ...res,
+        path: returnPath === true ? splitGeoJSON(turf.lineString(unwrapPath(res.path))) : undefined,
+        distance: res.weight / 1000,
+        distanceNM: (res.weight / 1000) * 0.539957,
       } : null;
   },
 

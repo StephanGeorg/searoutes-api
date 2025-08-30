@@ -1,6 +1,6 @@
 {
   "name": "searoutes-api",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "description": "Computes shortest maritime routes between two locations.",
   "main": "./dist/server.js",
   "scripts": {
@@ -41,6 +41,7 @@
     "express-query-boolean": "^2.0.0",
     "fast-safe-stringify": "^2.0.7",
     "flatbush": "^3.3.1",
+    "geojson-antimeridian-cut": "^0.1.0",
     "geojson-path-finder": "^2.0.0",
     "hot-shots": "^8.3.0",
     "http-status": "^1.4.2",
