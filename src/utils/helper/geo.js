@@ -1,5 +1,10 @@
-const R_EARTH = 6371000; // Meter
-const toRad = (d) => d * Math.PI / 180;
+const R_EARTH = 6371000;
+const toRad = (d) => (d * Math.PI) / 180;
+
+function shiftLon(coord, dx) {
+  let [lon, lat] = coord;
+  return [lon + dx, lat];
+}
 
 export const haversineMeters = (a, b) => {
   const [lon1, lat1] = a;
@@ -12,28 +17,47 @@ export const haversineMeters = (a, b) => {
   return 2 * R_EARTH * Math.asin(Math.sqrt(s));
 };
 
-// verhindert 359°-Sprünge innerhalb einer Linie
-export const unwrapLineString = (coords) => {
-  if (!coords || coords.length < 2) return coords;
-  const out = [coords[0].slice()];
-  for (let i = 1; i < coords.length; i++) {
-    const prev = out[i - 1];
-    let [lon, lat] = coords[i];
-    let d = lon - prev[0];
-    if (d > 180) lon -= 360;
-    else if (d < -180) lon += 360;
-    out.push([lon, lat]);
+function shiftGeometry(geom, dx) {
+  const mapCoords = (coords) => coords.map((c) =>
+    Array.isArray(c[0]) ? mapCoords(c) : shiftLon(c, dx)
+  );
+  return { type: geom.type, coordinates: mapCoords(geom.coordinates) };
+}
+
+export function triplicateGeoJSON(fc) {
+  const shifts = [-360, 0, 360];
+  const features = [];
+  for (const f of fc.features) {
+    for (const dx of shifts) {
+      features.push({
+        type: 'Feature',
+        properties: { ...f.properties, __wrapShift: dx },
+        geometry: shiftGeometry(f.geometry, dx),
+      });
+    }
   }
-  return out;
-};
+  return { type: 'FeatureCollection', features };
+}
 
-export const shiftLine = (coords, S) => coords.map(([lon, lat]) => [lon + S, lat]);
-
-export const normalizeTo180 = (coords) => {
-  if (!coords.length) return coords;
-  const unwrapped = unwrapLineString(coords);
-  return unwrapped.map(([lon, lat]) => {
-    const L = ((lon + 180) % 360 + 360) % 360 - 180;
-    return [L, lat];
+export function unwrapPath(path) {
+  // Bring longitudes back to [-180, 180] for rendering
+  return path.map(([lon, lat]) => {
+    let x = lon;
+    while (x > 180) x -= 360;
+    while (x < -180) x += 360;
+    return [x, lat];
   });
-};
+}
+
+export function normalizePair(a, b) {
+  // a, b are [lon, lat]
+  let [lonA, latA] = a;
+  let [lonB, latB] = b;
+
+  if (Math.abs(lonA - lonB) > 180) {
+    // Move the smaller one east or the larger one west—either is fine:
+    if (lonA < lonB) lonA += 360;
+    else lonB += 360;
+  }
+  return [[lonA, latA], [lonB, latB]];
+}
