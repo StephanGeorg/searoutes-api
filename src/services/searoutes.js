@@ -37,10 +37,10 @@ export default {
 
     console.time('Generating path');
     pathFinder = new PathFinder(tripled, {
-      // tolerance: 1e-7,
-      weight: (a, b) => haversineMeters(a, b),
-      // edgeDataReducer: (a, p) => ( p.id),
-      // edgeDataSeed: (properties) => (properties.id),
+      // tolerance: 1e-7, // Custom tolerance
+      weight: (a, b) => haversineMeters(a, b), // Custom weight function
+      // edgeDataReducer: (a, p) => ( p.id), // Custom edge data reducer
+      // edgeDataSeed: (properties) => (properties.id), // Custom edge data seed
     });
     console.timeEnd('Generating path');
   },

@@ -3,7 +3,7 @@ import * as turf from '@turf/turf';
 
 import SeaRoutesService from '../../src/services/searoutes';
 
-const util = require('util');
+// const util = require('util'); // Used for debugging
 
 describe('Sea routes Service', () => {
   before(function() {
