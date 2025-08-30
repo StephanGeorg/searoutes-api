@@ -30,7 +30,6 @@ export default {
     });
     index.finish();
     console.timeEnd('Indexing vertices data');
-    // Generate path
 
     console.time('Triplicating GeoJSON');
     const tripled = triplicateGeoJSON(geojson);
