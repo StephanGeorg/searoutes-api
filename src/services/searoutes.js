@@ -79,7 +79,7 @@ export default {
    * @param {object} endPoint
    * @returns
    */
-  getShortestPath(startPoint = {}, endPoint = {}, returnPath = true) {
+  getShortestPath(startPoint = {}, endPoint = {}, returnPath = false) {
     const start = startPoint.geometry.coordinates;
     const end = endPoint.geometry.coordinates;
     const [A, B] = normalizePair(start, end);
