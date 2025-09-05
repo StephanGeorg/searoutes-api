@@ -27,6 +27,11 @@ export default {
       },
       [Segments.QUERY]: {
         path: Joi.bool(),
+        // avoidNP: Joi.bool(), // Avoid routes using NWP or NEP
+        // avoidSuez: Joi.bool(), // Avoid routes using Suez channel
+        // avoidPanama: Joi.bool(), // Avoid routes using Panama channel
+        optimized: Joi.bool(), // Optimized routes w/o NP, Suez, Panama
+        // customNetwork: Joi.number(), // Provide id for customized network graph
       },
     },
   },
@@ -36,11 +41,11 @@ export default {
    */
   async getShortestRoute(req, res, next) {
     const { startPoint, endPoint } = req.params;
-    const { path } = req.query;
+    // const { path } = req.query;
     const startCoord = startPoint.split(',');
     const endCoord = endPoint.split(',');
     try {
-      const seaRoute = await SeaRoutesService.getShortestRoute(startCoord, endCoord, path);
+      const seaRoute = await SeaRoutesService.getShortestRoute(startCoord, endCoord, req.query);
       if (!seaRoute) throw errors.default;
       res.json(seaRoute);
     } catch (error) {

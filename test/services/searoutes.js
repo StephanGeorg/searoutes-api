@@ -6,7 +6,7 @@ import SeaRoutesService from '../../src/services/searoutes';
 // const util = require('util'); // Used for debugging
 
 describe('Sea routes Service', () => {
-  before(function() {
+  before(function beforeAllTests() {
     // Runs once before all tests in this describe block
     this.timeout(0);
     SeaRoutesService.init();
@@ -27,7 +27,7 @@ describe('Sea routes Service', () => {
       .getShortestRoute(
         [13.5029, 43.6214],
         [20.2621, 39.4982],
-        false,
+        { path: false },
       );
     const { distance, distanceNM } = seaRoute;
     expect(distance).to.be.equal(746.2536947598509);
@@ -40,7 +40,7 @@ describe('Sea routes Service', () => {
       .getShortestRoute(
         [-123.1203, 49.2705],
         [117.7006, 38.9847],
-        false,
+        { path: false },
       );
     const { distance, distanceNM } = seaRoute;
 
@@ -54,7 +54,7 @@ describe('Sea routes Service', () => {
       .getShortestRoute(
         [117.7006, 38.9847],
         [-123.1203, 49.2705],
-        false,
+        { path: false },
       );
     const { distance, distanceNM } = seaRoute;
 
@@ -68,7 +68,7 @@ describe('Sea routes Service', () => {
       .getShortestRoute(
         [121.714048, 25.138440],
         [-106.406200, 23.232900],
-        false,
+        { path: false },
       );
     const { distance, distanceNM } = seaRoute;
 
@@ -87,7 +87,7 @@ describe('Sea routes Service', () => {
       .getShortestRoute(
         [-106.406200, 23.232900],
         [121.714048, 25.138440],
-        false,
+        { path: false },
       );
     const { distance, distanceNM } = seaRoute;
 
@@ -106,7 +106,7 @@ describe('Sea routes Service', () => {
       .getShortestRoute(
         [13.5029, 43.6214],
         [20.2621, 39.4982],
-        true,
+        { path: true },
       );
     const { path } = seaRoute;
 
@@ -123,7 +123,7 @@ describe('Sea routes Service', () => {
       .getShortestRoute(
         [-123.1203, 49.2705],
         [117.7006, 38.9847],
-        true,
+        { path: true },
       );
     const { path } = seaRoute;
 
@@ -139,7 +139,7 @@ describe('Sea routes Service', () => {
       .getShortestRoute(
         [117.7006, 38.9847],
         [-123.1203, 49.2705],
-        true,
+        { path: true },
       );
     const { path } = seaRoute;
 
@@ -147,6 +147,32 @@ describe('Sea routes Service', () => {
     expect(path.type).to.equal('Feature');
     expect(path.geometry.type).to.equal('MultiLineString');
     expect(path.geometry.coordinates.length).to.be.equal(2);
+    done();
+  });
+
+  it('should return sea route path from optimized network (CNSGH  <- DEHAM)', (done) => {
+    const seaRoute = SeaRoutesService
+      .getShortestRoute(
+        [121.48, 31.23],
+        [9.93, 53.52],
+        { path: true, optimized: true },
+      );
+    const { path, distance, distanceNM } = seaRoute;
+
+    // Debugging
+    // console.log('%o', seaRoute);
+    /* console.log(util.inspect(seaRoute.path, {
+      depth: null,
+      colors: false,
+      maxArrayLength: null,
+    })); */
+
+    expect(distance).to.be.equal(26269.39306621979);
+    expect(distanceNM).to.be.equal(14184.342671856839);
+    expect(path).to.not.equal(undefined);
+    expect(path.type).to.equal('Feature');
+    expect(path.geometry.type).to.equal('LineString');
+    expect(path.geometry.coordinates.length).to.be.equal(440);
     done();
   });
 });
