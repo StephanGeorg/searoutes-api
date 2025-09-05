@@ -8,7 +8,7 @@ const router = express.Router({
 });
 
 /**
- *  Get user by id
+ *  Get shortest maritime route
  */
 router.get(
   '/shortest/:startPoint/:endPoint',

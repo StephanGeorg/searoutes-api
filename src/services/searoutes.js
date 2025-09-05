@@ -13,12 +13,38 @@ import {
 const geojson = require('../../data/eurostat.json');
 
 let pathFinder;
+let pathFinderOptimized;
 let vertices;
 let index;
 
 export default {
+  /* customEdgeReducer(a, b) {
+    // console.log('reducer', { a, b, p });
+  }, */
+  /* customEdgeDataSeed(a, b, p) {
+    // return a;
+  }, */
   /**
-   * Initialize searoutes data from geojson
+   * Custom weight function for edges
+   * @param {*} a from edge
+   * @param {*} b to edge
+   * @param {*} edgeData props of the edge
+   * @returns number
+   */
+  customWeight(a, b, edgeData) {
+    const blockedEdges = [
+      40019, // Suez channel
+      // 40535, // Panama channel
+      85565, // NWP
+      106668, // NEP
+    ];
+    return blockedEdges.includes(edgeData.fid)
+      ? Infinity
+      : haversineMeters(a, b);
+  },
+
+  /**
+   * Initialize sea routes data from geojson
    */
   init() {
     // Load vertices from routes
@@ -36,16 +62,29 @@ export default {
     console.timeEnd('Triplicating GeoJSON');
 
     console.time('Generating path');
+    // Standard pathfinder
     pathFinder = new PathFinder(tripled, {
       // tolerance: 1e-7, // Custom tolerance
-      weight: (a, b) => haversineMeters(a, b), // Custom weight function
-      // edgeDataReducer: (a, p) => ( p.id), // Custom edge data reducer
-      // edgeDataSeed: (properties) => (properties.id), // Custom edge data seed
+      // weight: (a, b, edgeData) => this.customWeight(a, b, edgeData), // Custom weight function
+      weight: (a, b) => haversineMeters(a, b), // Standard haversine weight
+      // edgeDataReducer: (a, b, p) => this.customEdgeReducer(a, b, p), // Custom edge data reducer
+      // edgeDataSeed: (a, b, p) => this.customEdgeDataSeed(a, b, p), // Custom edge data seed
+    });
+    // Optimized pathfinder (no NWP, NEP, Suez)
+    pathFinderOptimized = new PathFinder(tripled, {
+      weight: (a, b, edgeData) => this.customWeight(a, b, edgeData), // Custom weight function
     });
     console.timeEnd('Generating path');
   },
 
-  getPathFinder() {
+  /**
+   * Get the pathfinder instance
+   * @param {*} options Query options
+   * @returns object
+   */
+  getPathFinder(options = {}) {
+    const { optimized = false } = options;
+    if (optimized === true) return pathFinderOptimized;
     return pathFinder;
   },
 
@@ -79,7 +118,8 @@ export default {
    * @param {object} endPoint
    * @returns
    */
-  getShortestPath(startPoint = {}, endPoint = {}, returnPath = false) {
+  getShortestPath(startPoint = {}, endPoint = {}, options = {}) {
+    const { path = false } = options;
     const start = startPoint.geometry.coordinates;
     const end = endPoint.geometry.coordinates;
     const [A, B] = normalizePair(start, end);
@@ -88,11 +128,11 @@ export default {
     const AasGeoJSON = turf.point(A);
     const BasGeoJSON = turf.point(B);
 
-    const res = this.getPathFinder().findPath(AasGeoJSON, BasGeoJSON);
+    const res = this.getPathFinder(options).findPath(AasGeoJSON, BasGeoJSON);
     return res
       ? {
         ...res,
-        path: returnPath === true ? splitGeoJSON(turf.lineString(unwrapPath(res.path))) : undefined,
+        path: path === true ? splitGeoJSON(turf.lineString(unwrapPath(res.path))) : undefined,
         distance: res.weight / 1000,
         distanceNM: (res.weight / 1000) * 0.539957,
       } : null;
@@ -104,7 +144,7 @@ export default {
    * @param {*} endPoint
    * @returns
    */
-  getShortestRoute(startPoint = [], endPoint = [], returnPath) {
+  getShortestRoute(startPoint = [], endPoint = [], options = {}) {
     const start = turf.point(startPoint);
     const end = turf.point(endPoint);
 
@@ -118,7 +158,7 @@ export default {
     const shortestPath = this.getShortestPath(
       startPointSnapped,
       endPointSnapped,
-      returnPath,
+      options,
     );
 
     return shortestPath;
