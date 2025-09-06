@@ -150,12 +150,12 @@ describe('Sea routes Service', () => {
     done();
   });
 
-  it('should return sea route path from optimized network (CNSGH  <- DEHAM)', (done) => {
+  it('should return sea route path from trade optimized network (CNSGH  <- DEHAM)', (done) => {
     const seaRoute = SeaRoutesService
       .getShortestRoute(
         [121.48, 31.23],
         [9.93, 53.52],
-        { path: true, optimized: true },
+        { path: true, network: 'trade' },
       );
     const { path, distance, distanceNM } = seaRoute;
 

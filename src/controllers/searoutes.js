@@ -30,7 +30,7 @@ export default {
         // avoidNP: Joi.bool(), // Avoid routes using NWP or NEP
         // avoidSuez: Joi.bool(), // Avoid routes using Suez channel
         // avoidPanama: Joi.bool(), // Avoid routes using Panama channel
-        optimized: Joi.bool(), // Optimized routes w/o NP, Suez, Panama
+        network: Joi.string(), // Optimized routes w/o NP, Suez, Panama
         // customNetwork: Joi.number(), // Provide id for customized network graph
       },
     },

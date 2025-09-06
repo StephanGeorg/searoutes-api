@@ -13,7 +13,7 @@ import {
 const geojson = require('../../data/eurostat.json');
 
 let pathFinder;
-let pathFinderOptimized;
+let pathFinderTradeRoutes;
 let vertices;
 let index;
 
@@ -70,8 +70,8 @@ export default {
       // edgeDataReducer: (a, b, p) => this.customEdgeReducer(a, b, p), // Custom edge data reducer
       // edgeDataSeed: (a, b, p) => this.customEdgeDataSeed(a, b, p), // Custom edge data seed
     });
-    // Optimized pathfinder (no NWP, NEP, Suez)
-    pathFinderOptimized = new PathFinder(tripled, {
+    // Optimized trade routes pathfinder (no NWP, NEP, Suez)
+    pathFinderTradeRoutes = new PathFinder(tripled, {
       weight: (a, b, edgeData) => this.customWeight(a, b, edgeData), // Custom weight function
     });
     console.timeEnd('Generating path');
@@ -83,9 +83,16 @@ export default {
    * @returns object
    */
   getPathFinder(options = {}) {
-    const { optimized = false } = options;
-    if (optimized === true) return pathFinderOptimized;
-    return pathFinder;
+    const { network } = options;
+    switch (network) {
+      case 'trade':
+        return pathFinderTradeRoutes;
+      case 'default':
+      case 'normal':
+      case 'all':
+      default:
+        return pathFinder;
+    }
   },
 
   getVertices() {
