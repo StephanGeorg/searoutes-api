@@ -143,7 +143,7 @@ export default {
         ...res,
         path: path === true ? splitGeoJSON(turf.lineString(unwrapPath(res.path))) : undefined,
         distance: res.weight / 1000,
-        distanceNM: Number(((res.weight / 1000) * 0.539957).toFixed(2)),
+        distanceNM: Math.round(((res.weight / 1000) * 0.539957) * 100) / 100,
       } : null;
   },
 
