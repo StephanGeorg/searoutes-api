@@ -17,13 +17,6 @@ let pathFinderTradeRoutes;
 let vertices;
 let index;
 
-// const pathFinder = [];
-const networks  = {
-  default: [],
-  trade: [],
-  noNP: [],
-};
-
 export default {
   /* customEdgeReducer(a, b) {
     // console.log('reducer', { a, b, p });
