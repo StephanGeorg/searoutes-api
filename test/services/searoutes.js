@@ -30,8 +30,8 @@ describe('Sea routes Service', () => {
         { path: false },
       );
     const { distance, distanceNM } = seaRoute;
-    expect(distance).to.be.equal(746.2536947598509);
-    expect(distanceNM).to.be.equal(402.9449062614448);
+    expect(distance).to.be.equal(746.199);
+    expect(distanceNM).to.be.equal(402.92);
     done();
   });
 
@@ -44,8 +44,8 @@ describe('Sea routes Service', () => {
       );
     const { distance, distanceNM } = seaRoute;
 
-    expect(distance).to.be.equal(10560.60953774451);
-    expect(distanceNM).to.be.equal(5702.275044171913);
+    expect(distance).to.be.equal(10560.571);
+    expect(distanceNM).to.be.equal(5702.25);
     done();
   });
 
@@ -58,8 +58,8 @@ describe('Sea routes Service', () => {
       );
     const { distance, distanceNM } = seaRoute;
 
-    expect(distance).to.be.equal(10560.60953774451);
-    expect(distanceNM).to.be.equal(5702.275044171913);
+    expect(distance).to.be.equal(10560.571);
+    expect(distanceNM).to.be.equal(5702.25);
     done();
   });
 
@@ -72,8 +72,8 @@ describe('Sea routes Service', () => {
       );
     const { distance, distanceNM } = seaRoute;
 
-    expect(distance).to.be.equal(12920.376288015616);
-    expect(distanceNM).to.be.equal(6976.447619348048);
+    expect(distance).to.be.equal(12920.344);
+    expect(distanceNM).to.be.equal(6976.43);
 
     // Debugging
     // console.log('%o', seaRoute);
@@ -91,8 +91,8 @@ describe('Sea routes Service', () => {
       );
     const { distance, distanceNM } = seaRoute;
 
-    expect(distance).to.be.equal(12920.376288015614);
-    expect(distanceNM).to.be.equal(6976.447619348047);
+    expect(distance).to.be.equal(12920.344);
+    expect(distanceNM).to.be.equal(6976.43);
 
     // Debugging
     // console.log('%o', seaRoute);
@@ -160,19 +160,18 @@ describe('Sea routes Service', () => {
     const { path, distance, distanceNM } = seaRoute;
 
     // Debugging
-    // console.log('%o', seaRoute);
     /* console.log(util.inspect(seaRoute.path, {
       depth: null,
       colors: false,
       maxArrayLength: null,
     })); */
 
-    expect(distance).to.be.equal(26269.39306621979);
-    expect(distanceNM).to.be.equal(14184.342671856839);
+    expect(distance).to.be.equal(26269.169);
+    expect(distanceNM).to.be.equal(14184.22);
     expect(path).to.not.equal(undefined);
     expect(path.type).to.equal('Feature');
     expect(path.geometry.type).to.equal('LineString');
-    expect(path.geometry.coordinates.length).to.be.equal(440);
+    expect(path.geometry.coordinates.length).to.be.equal(446);
     done();
   });
 });

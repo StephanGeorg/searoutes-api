@@ -5,7 +5,7 @@ import splitGeoJSON from 'geojson-antimeridian-cut';
 
 import {
   triplicateGeoJSON,
-  haversineMeters,
+  haversine,
   normalizePair,
   unwrapPath,
 } from '../utils/helper/geo';
@@ -16,6 +16,13 @@ let pathFinder;
 let pathFinderTradeRoutes;
 let vertices;
 let index;
+
+// const pathFinder = [];
+const networks  = {
+  default: [],
+  trade: [],
+  noNP: [],
+};
 
 export default {
   /* customEdgeReducer(a, b) {
@@ -35,12 +42,14 @@ export default {
     const blockedEdges = [
       40019, // Suez channel
       // 40535, // Panama channel
+      // 14052, // Sunda strait
+      // 73448, // Sunda strait
       85565, // NWP
       106668, // NEP
     ];
     return blockedEdges.includes(edgeData.fid)
       ? Infinity
-      : haversineMeters(a, b);
+      : Math.trunc(haversine(a, b));
   },
 
   /**
@@ -66,7 +75,7 @@ export default {
     pathFinder = new PathFinder(tripled, {
       // tolerance: 1e-7, // Custom tolerance
       // weight: (a, b, edgeData) => this.customWeight(a, b, edgeData), // Custom weight function
-      weight: (a, b) => haversineMeters(a, b), // Standard haversine weight
+      weight: (a, b) => Math.trunc(haversine(a, b)), // Standard haversine weight
       // edgeDataReducer: (a, b, p) => this.customEdgeReducer(a, b, p), // Custom edge data reducer
       // edgeDataSeed: (a, b, p) => this.customEdgeDataSeed(a, b, p), // Custom edge data seed
     });
@@ -141,7 +150,7 @@ export default {
         ...res,
         path: path === true ? splitGeoJSON(turf.lineString(unwrapPath(res.path))) : undefined,
         distance: res.weight / 1000,
-        distanceNM: (res.weight / 1000) * 0.539957,
+        distanceNM: Number(((res.weight / 1000) * 0.539957).toFixed(2)),
       } : null;
   },
 
