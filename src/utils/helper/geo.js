@@ -131,10 +131,8 @@ export function unwrapPath(path) {
   return path.map(([lon, lat]) => {
     // Optimized normalization using modulo operation instead of while loops
     // Handle cases where pathfinding used shifted coordinates from -540° to +540°
-    let x = ((lon + 180) % 360) - 180;
-
-    // Handle edge case for exactly -180
-    if (x === -180 && lon > 0) x = 180;
+    // The modulo operation ((lon + 180) % 360) - 180 normalizes to (-180, 180]
+    const x = ((lon + 180) % 360) - 180;
 
     return [x, lat]; // Latitude remains unchanged as it doesn't wrap
   });
